@@ -18,6 +18,8 @@ The Trier component does the work of a try-catch with some specifics:
 
 If the exception being thrown during a Trier execution extends the type MappedException, the Trier will consider it as part of the expected flow that you've designed, so it will let it go. On the other hand, if the exception does not extend the MappedException type, the Trier will consider it a breach and catch it, passing it to the parameterized handler specified at the Trier instantiation phase.
 
+To understand more about the Mapped Exceptions, go [here](https://github.com/clean-arch-enablers-project/cae-utils-mapped-exceptions).
+
 The Trier can wrap 4 types of Action:
 
 - FunctionAction: has Input and Output
