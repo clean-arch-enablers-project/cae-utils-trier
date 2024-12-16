@@ -7,8 +7,8 @@
     <description>CAE Trier library</description>
     <url>https://github.com/clean-arch-enablers-project/cae-utils-trier/blob/main/README.md</url>
     <groupId>com.clean-arch-enablers</groupId>
-    <artifactId>trier</artifactId>
-    <version>1.0.1</version>
+    <artifactId>cae-trier</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <licenses>
         <license>
@@ -36,8 +36,8 @@
     <dependencies>
         <dependency>
             <groupId>com.clean-arch-enablers</groupId>
-            <artifactId>mapped-exceptions</artifactId>
-            <version>1.0.1</version>
+            <artifactId>cae-mapped-exceptions</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
