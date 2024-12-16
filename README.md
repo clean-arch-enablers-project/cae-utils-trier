@@ -9,7 +9,7 @@ Welcome to the repository for the open source CAE Trier library!
 ```xml
 <dependency>
   <groupId>com.clean-arch-enablers</groupId>
-  <artifactId>trier</artifactId>
+  <artifactId>cae-trier</artifactId>
   <version>${version}</version>
 </dependency>
 ```
