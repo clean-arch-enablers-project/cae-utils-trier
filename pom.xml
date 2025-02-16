@@ -38,6 +38,7 @@
             <groupId>com.clean-arch-enablers</groupId>
             <artifactId>cae-mapped-exceptions</artifactId>
             <version>1.0.0</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
