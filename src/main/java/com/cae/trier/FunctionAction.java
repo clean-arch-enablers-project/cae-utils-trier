@@ -7,7 +7,7 @@ import java.util.function.Function;
  * @param <I> type of the input
  * @param <O> type of the output
  */
-public class FunctionAction<I, O> implements Action<I, O> {
+public class FunctionAction<I, O> extends Action<I, O> {
 
     /**
      * The action itself
@@ -24,7 +24,7 @@ public class FunctionAction<I, O> implements Action<I, O> {
      * @return the output provided by the action itself
      */
     @Override
-    public O execute(I input) {
+    public O executeInternalAction(I input) {
         return this.function.apply(input);
     }
 }
