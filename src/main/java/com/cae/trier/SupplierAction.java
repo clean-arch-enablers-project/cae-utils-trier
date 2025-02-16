@@ -6,7 +6,7 @@ import java.util.function.Supplier;
  * Actions that only have output, but no input
  * @param <O> the output type
  */
-public class SupplierAction<O> implements Action<Void, O>{
+public class SupplierAction<O> extends Action<Void, O>{
 
     /**
      * The action itself
@@ -24,7 +24,7 @@ public class SupplierAction<O> implements Action<Void, O>{
      * @return the output provided by the action itself
      */
     @Override
-    public O execute(Void input) {
+    public O executeInternalAction(Void input) {
         return this.supplier.get();
     }
 }

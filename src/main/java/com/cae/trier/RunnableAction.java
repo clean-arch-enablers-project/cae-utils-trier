@@ -3,7 +3,7 @@ package com.cae.trier;
 /**
  * Actions that don't have either input or output
  */
-public class RunnableAction implements Action<Void, Void> {
+public class RunnableAction extends Action<Void, Void> {
 
     /**
      * Action itself
@@ -21,7 +21,7 @@ public class RunnableAction implements Action<Void, Void> {
      * @return null as runnables don't return anything
      */
     @Override
-    public Void execute(Void input) {
+    public Void executeInternalAction(Void input) {
         this.runnable.run();
         return null;
     }

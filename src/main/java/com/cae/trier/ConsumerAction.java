@@ -6,7 +6,7 @@ import java.util.function.Consumer;
  * Actions that only have input, but no output.
  * @param <I> type of the input
  */
-public class ConsumerAction<I> implements Action<I, Void>{
+public class ConsumerAction<I> extends Action<I, Void>{
 
     /**
      * The action itself to be executed.
@@ -23,7 +23,7 @@ public class ConsumerAction<I> implements Action<I, Void>{
      * @return null as Consumers don't return anything
      */
     @Override
-    public Void execute(I input) {
+    public Void executeInternalAction(I input) {
         this.consumer.accept(input);
         return null;
     }

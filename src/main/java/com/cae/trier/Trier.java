@@ -2,13 +2,20 @@ package com.cae.trier;
 
 
 import com.cae.mapped_exceptions.MappedException;
+import com.cae.mapped_exceptions.specifics.InternalMappedException;
+import com.cae.trier.retrier.NoRetriesLeftException;
+import com.cae.trier.retrier.OnExhaustion;
+import com.cae.trier.retrier.RetryPolicy;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Trier is specialized in execution actions that might throw MappedException
+ * Trier is specialized in executing actions that might throw MappedException
  * instances and other kind of exceptions. When the exception caught is
  * a MappedException instance, the Trier lets it go, as it is considered as
  * part of the planned flow. When the exception caught is not a MappedException,
@@ -34,11 +41,26 @@ public class Trier<I, O> {
      * execution of the parameterized action
      */
     private final UnexpectedExceptionHandler unexpectedExceptionHandler;
+    /**
+     * Map for exceptions that must trigger retry attempts
+     */
+    private final Map<Class<? extends Exception>, RetryPolicy> retryPolicies;
+    /**
+     * Handler for failed executions
+     */
+    private final OnExhaustion onExhaustionHandler;
 
-    private Trier(Action<I, O> action, I input, UnexpectedExceptionHandler unexpectedExceptionHandler) {
+    private Trier(
+            Action<I, O> action,
+            I input,
+            UnexpectedExceptionHandler unexpectedExceptionHandler,
+            Map<Class<? extends Exception>, RetryPolicy> retryPolicies,
+            OnExhaustion onExhaustionHandler) {
         this.action = action;
         this.input = input;
         this.unexpectedExceptionHandler = unexpectedExceptionHandler;
+        this.retryPolicies = retryPolicies;
+        this.onExhaustionHandler = onExhaustionHandler;
     }
 
     /**
@@ -99,9 +121,17 @@ public class Trier<I, O> {
      * @return the output of the action. If the action is a consumer or a
      * runnable, its output will be null.
      */
-    public O finishAndExecuteAction(){
+    public O execute(){
         try {
-            return this.action.execute(this.input);
+            return this.action.execute(this.input, this.retryPolicies);
+        } catch (NoRetriesLeftException noRetriesLeftException){
+            Optional.ofNullable(this.onExhaustionHandler)
+                    .orElseThrow(() -> new InternalMappedException(
+                            "Exhausted all retries but no circuit-break setting was provided",
+                            "If you are dealing with retries, make sure you set a circuit-break option by calling the 'onFailure' method while building the Trier object"
+                    ))
+                    .handle(noRetriesLeftException.getFailureStatus());
+            throw noRetriesLeftException;
         } catch (MappedException mappedException){
             throw mappedException;
         } catch (Exception unexpectedException){
@@ -119,10 +149,26 @@ public class Trier<I, O> {
 
         private final Action<I, O> action;
         private final I input;
+        private final Map<Class<? extends Exception>, RetryPolicy> retryPolicies = new HashMap<>();
+        private OnExhaustion onExhaustion;
 
         private TrierBuilder(Action<I, O> action, I input) {
             this.action = action;
             this.input = input;
+        }
+
+        public <E extends Exception> TrierBuilder<I, O> retryOn(
+                Class<E> exceptionClass,
+                Integer maxAmountOfRetries,
+                Integer baseTimeInSeconds){
+            if (exceptionClass != NoRetriesLeftException.class)
+                this.retryPolicies.put(exceptionClass, RetryPolicy.of(maxAmountOfRetries, baseTimeInSeconds));
+            return this;
+        }
+
+        public TrierBuilder<I, O> onExhaustion(OnExhaustion onExhaustion){
+            this.onExhaustion = onExhaustion;
+            return this;
         }
 
         /**
@@ -139,8 +185,14 @@ public class Trier<I, O> {
          * as the input to be fed to the action if necessary, and the handler
          * for unexpected exceptions.
          */
-        public Trier<I, O> setHandlerForUnexpectedException(UnexpectedExceptionHandler handler){
-            return new Trier<>(this.action, this.input, handler);
+        public Trier<I, O> setUnexpectedExceptionHandler(UnexpectedExceptionHandler handler){
+            return new Trier<>(
+                    this.action,
+                    this.input,
+                    handler,
+                    this.retryPolicies,
+                    this.onExhaustion
+            );
         }
     }
 
