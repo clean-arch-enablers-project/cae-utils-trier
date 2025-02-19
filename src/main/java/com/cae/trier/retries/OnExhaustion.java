@@ -1,4 +1,4 @@
-package com.cae.trier.retrier;
+package com.cae.trier.retries;
 
 @FunctionalInterface
 public interface OnExhaustion {

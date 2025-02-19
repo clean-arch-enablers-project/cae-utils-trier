@@ -1,4 +1,4 @@
-package com.cae.trier.retrier;
+package com.cae.trier.retries;
 
 import java.util.Optional;
 import java.util.concurrent.*;

@@ -1,4 +1,4 @@
-package com.cae.trier.retrier;
+package com.cae.trier.retries;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -11,10 +11,10 @@ public class RetryNotifier {
 
     private RetryNotifier(){}
 
-    private final CopyOnWriteArrayList<RetryNotificationInterested> interested = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<RetryObserver> interested = new CopyOnWriteArrayList<>();
 
-    public RetryNotifier subscribe(RetryNotificationInterested retryNotificationInterested){
-        this.interested.add(retryNotificationInterested);
+    public RetryNotifier subscribe(RetryObserver retryObserver){
+        this.interested.add(retryObserver);
         return this;
     }
 
