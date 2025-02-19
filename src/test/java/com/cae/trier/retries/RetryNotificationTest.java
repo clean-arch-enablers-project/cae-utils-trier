@@ -1,4 +1,4 @@
-package com.cae.trier.retrier;
+package com.cae.trier.retries;
 
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
 import com.cae.trier.Trier;
@@ -59,7 +59,7 @@ class RetryNotificationTest {
 
     }
 
-    public static abstract class ConcreteInterested implements RetryNotificationInterested{
+    public static abstract class ConcreteInterested implements RetryObserver {
         public Boolean called = false;
     }
 

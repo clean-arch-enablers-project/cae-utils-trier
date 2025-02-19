@@ -3,9 +3,9 @@ package com.cae.trier;
 
 import com.cae.mapped_exceptions.MappedException;
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
-import com.cae.trier.retrier.NoRetriesLeftException;
-import com.cae.trier.retrier.OnExhaustion;
-import com.cae.trier.retrier.RetryPolicy;
+import com.cae.trier.retries.NoRetriesLeftException;
+import com.cae.trier.retries.OnExhaustion;
+import com.cae.trier.retries.RetryPolicy;
 
 import java.util.HashMap;
 import java.util.Map;

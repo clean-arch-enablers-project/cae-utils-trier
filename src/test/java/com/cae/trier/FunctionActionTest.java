@@ -1,6 +1,6 @@
 package com.cae.trier;
 
-import com.cae.trier.retrier.RetryPolicy;
+import com.cae.trier.retries.RetryPolicy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
