@@ -1,6 +1,6 @@
 package com.cae.trier;
 
-import com.cae.trier.retries.RetryPolicy;
+import com.cae.trier.autoretry.AutoretryPolicy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +13,7 @@ class FunctionActionTest {
 
     @Test
     void shouldExecuteTheSupplierAction(){
-        var retryBlueprint = new HashMap<Class<? extends Exception>, RetryPolicy>();
+        var retryBlueprint = new HashMap<Class<? extends Exception>, AutoretryPolicy>();
         var functionMother = new FunctionMother();
         var functionAction = new FunctionAction<>(functionMother::runStuff);
         var result = functionAction.execute("iha!!", retryBlueprint);

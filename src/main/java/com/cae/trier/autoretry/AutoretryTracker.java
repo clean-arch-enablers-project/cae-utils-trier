@@ -1,12 +1,12 @@
-package com.cae.trier.retries;
+package com.cae.trier.autoretry;
 
-public class RetryTracker {
+public class AutoretryTracker {
 
-    public static RetryTracker newOf(RetryPolicy retryPolicy){
-        var newTracker = new RetryTracker();
+    public static AutoretryTracker newOf(AutoretryPolicy autoretryPolicy){
+        var newTracker = new AutoretryTracker();
         newTracker.numberOfRetriesTriggered = 0;
-        newTracker.maxAmountOfRetriesAllowed = retryPolicy.getMaxAmountOfRetries();
-        newTracker.baseTimeInSeconds = retryPolicy.getBaseTimeInSeconds();
+        newTracker.maxAmountOfRetriesAllowed = autoretryPolicy.getMaxAmountOfRetries();
+        newTracker.baseTimeInSeconds = autoretryPolicy.getBaseTimeInSeconds();
         return newTracker;
     }
 
@@ -18,7 +18,7 @@ public class RetryTracker {
         if (this.numberOfRetriesTriggered < this.maxAmountOfRetriesAllowed){
             var delayToRetry = (int) ((this.baseTimeInSeconds) * (Math.pow(2, this.numberOfRetriesTriggered)));
             this.numberOfRetriesTriggered += 1;
-            RetryNotifier.SINGLETON.emitNewNotification(RetryNotification.of(cause, this.numberOfRetriesTriggered));
+            AutoretryNotifier.SINGLETON.emitNewNotification(AutoretryNotification.of(cause, this.numberOfRetriesTriggered));
             return delayToRetry;
         }
         throw new NoRetriesLeftException(

@@ -3,9 +3,9 @@ package com.cae.trier;
 
 import com.cae.mapped_exceptions.MappedException;
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
-import com.cae.trier.retries.NoRetriesLeftException;
-import com.cae.trier.retries.OnExhaustion;
-import com.cae.trier.retries.RetryPolicy;
+import com.cae.trier.autoretry.AutoretryPolicy;
+import com.cae.trier.autoretry.NoRetriesLeftException;
+import com.cae.trier.autoretry.OnExhaustion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class Trier<I, O> {
     /**
      * Map for exceptions that must trigger retry attempts
      */
-    private final Map<Class<? extends Exception>, RetryPolicy> retryPolicies;
+    private final Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies;
     /**
      * Handler for failed executions
      */
@@ -54,7 +54,7 @@ public class Trier<I, O> {
             Action<I, O> action,
             I input,
             UnexpectedExceptionHandler unexpectedExceptionHandler,
-            Map<Class<? extends Exception>, RetryPolicy> retryPolicies,
+            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies,
             OnExhaustion onExhaustionHandler) {
         this.action = action;
         this.input = input;
@@ -149,7 +149,7 @@ public class Trier<I, O> {
 
         private final Action<I, O> action;
         private final I input;
-        private final Map<Class<? extends Exception>, RetryPolicy> retryPolicies = new HashMap<>();
+        private final Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies = new HashMap<>();
         private OnExhaustion onExhaustion;
 
         private TrierBuilder(Action<I, O> action, I input) {
@@ -157,12 +157,12 @@ public class Trier<I, O> {
             this.input = input;
         }
 
-        public <E extends Exception> TrierBuilder<I, O> retryOn(
+        public <E extends Exception> TrierBuilder<I, O> autoretryOn(
                 Class<E> exceptionClass,
                 Integer maxAmountOfRetries,
                 Integer baseTimeInSeconds){
             if (exceptionClass != NoRetriesLeftException.class)
-                this.retryPolicies.put(exceptionClass, RetryPolicy.of(maxAmountOfRetries, baseTimeInSeconds));
+                this.retryPolicies.put(exceptionClass, AutoretryPolicy.of(maxAmountOfRetries, baseTimeInSeconds));
             return this;
         }
 

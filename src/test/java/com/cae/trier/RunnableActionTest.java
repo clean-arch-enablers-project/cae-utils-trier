@@ -1,6 +1,6 @@
 package com.cae.trier;
 
-import com.cae.trier.retries.RetryPolicy;
+import com.cae.trier.autoretry.AutoretryPolicy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +13,7 @@ class RunnableActionTest {
 
     @Test
     void shouldExecuteTheRunnableAction(){
-        var retryBlueprint = new HashMap<Class<? extends Exception>, RetryPolicy>();
+        var retryBlueprint = new HashMap<Class<? extends Exception>, AutoretryPolicy>();
         var counter = new Counter();
         var runnableMother = new RunnableMethod(counter);
         var runnableAction = new RunnableAction(runnableMother::runStuff);

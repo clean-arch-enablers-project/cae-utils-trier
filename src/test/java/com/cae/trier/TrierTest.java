@@ -3,8 +3,8 @@ package com.cae.trier;
 import com.cae.mapped_exceptions.specifics.InputMappedException;
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
 import com.cae.mapped_exceptions.specifics.NotFoundMappedException;
-import com.cae.trier.retries.NoRetriesLeftException;
-import com.cae.trier.retries.OnExhaustion;
+import com.cae.trier.autoretry.NoRetriesLeftException;
+import com.cae.trier.autoretry.OnExhaustion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,7 +68,7 @@ class TrierTest {
     @Test
     void shouldRetryOnRuntimeException(){
         var trier = Trier.of(() -> new Actions().runtimeExceptionThrowingMethod()) //the method is forced to throw RuntimeException
-            .retryOn(RuntimeException.class, 3, 2)
+            .autoretryOn(RuntimeException.class, 3, 2)
             .onExhaustion(this::handleExhaustion)
             .setUnexpectedExceptionHandler(unexpectedException -> new InternalMappedException(
                 "Something went wrong while trying to run the method",
@@ -80,7 +80,7 @@ class TrierTest {
     @Test
     void shouldRetryOnInputMappedException(){
         var trier = Trier.of(() -> new Actions().inputMappedExceptionThrowingMethod()) //the method is forced to throw InputMappedException
-                .retryOn(InputMappedException.class, 3, 2)
+                .autoretryOn(InputMappedException.class, 3, 2)
                 .onExhaustion(this::handleExhaustion)
                 .setUnexpectedExceptionHandler(unexpectedException -> new InternalMappedException(
                         "Something went wrong while trying to run the method",
@@ -93,9 +93,9 @@ class TrierTest {
     void shouldBeAbleToFinishSuccessfullyAfterSecondRetry(){
         var action = new Actions();
         var trier = Trier.of(action::someIntermittentMethod) //the method is forced to throw RuntimeException
-                .retryOn(InternalMappedException.class, 3, 2)
-                .retryOn(RuntimeException.class, 3, 2)
-                .retryOn(IOException.class, 5, 1)
+                .autoretryOn(InternalMappedException.class, 3, 2)
+                .autoretryOn(RuntimeException.class, 3, 2)
+                .autoretryOn(IOException.class, 5, 1)
                 .onExhaustion(this::handleExhaustion)
                 .setUnexpectedExceptionHandler(unexpectedException -> new InternalMappedException(
                         "Something went wrong while trying to run the method",

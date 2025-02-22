@@ -2,9 +2,9 @@ package com.cae.trier;
 
 import com.cae.mapped_exceptions.MappedException;
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
-import com.cae.trier.retries.AsyncDelayScheduler;
-import com.cae.trier.retries.NoRetriesLeftException;
-import com.cae.trier.retries.RetryPolicy;
+import com.cae.trier.autoretry.AsyncDelayScheduler;
+import com.cae.trier.autoretry.NoRetriesLeftException;
+import com.cae.trier.autoretry.AutoretryPolicy;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public abstract class Action <I, O>{
 
     public O execute(
             I input,
-            Map<Class<? extends Exception>, RetryPolicy> retryPolicies){
+            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies){
         try {
             return this.executeInternalAction(input);
         } catch (NoRetriesLeftException noRetriesLeftException){
@@ -41,7 +41,7 @@ public abstract class Action <I, O>{
 
     private O runRetryOn(
             I input,
-            Map<Class<? extends Exception>, RetryPolicy> retryPolicies,
+            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies,
             Integer delayToWait) {
         try{
             return AsyncDelayScheduler.SINGLETON.scheduleWithDelay(
@@ -60,9 +60,9 @@ public abstract class Action <I, O>{
         }
     }
 
-    private Optional<RetryPolicy> getRetryPolicyBy(
+    private Optional<AutoretryPolicy> getRetryPolicyBy(
             Exception exception,
-            Map<Class<? extends Exception>, RetryPolicy> retryPolicies){
+            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies){
         return Optional.ofNullable(retryPolicies.get(exception.getClass()));
     }
 
