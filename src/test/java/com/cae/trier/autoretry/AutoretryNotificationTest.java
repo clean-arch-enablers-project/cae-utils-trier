@@ -1,4 +1,4 @@
-package com.cae.trier.retries;
+package com.cae.trier.autoretry;
 
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
 import com.cae.trier.Trier;
@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class RetryNotificationTest {
+class AutoretryNotificationTest {
 
     @Test
     void shouldNotifyAllInterested() {
@@ -19,14 +19,14 @@ class RetryNotificationTest {
         var interestedB = new InterestedB();
         var interestedB2 = new InterestedB();
         List.of(interestedA, interestedA2, interestedB, interestedB2).forEach(interested -> Assertions.assertFalse(interested.called));
-        RetryNotifier.SINGLETON
+        AutoretryNotifier.SINGLETON
                 .subscribe(interestedA)
                 .subscribe(interestedA2)
                 .subscribe(interestedB)
                 .subscribe(interestedB2);
         try {
             Trier.of(this::someFailingAction)
-                    .retryOn(RuntimeException.class, 5, 1)
+                    .autoretryOn(RuntimeException.class, 5, 1)
                     .onExhaustion(failureStatus -> System.out.println("I knew it! " + failureStatus.getException()))
                     .setUnexpectedExceptionHandler(unexpectedException -> new InternalMappedException("opsie", "indeed"))
                     .execute();
@@ -42,9 +42,9 @@ class RetryNotificationTest {
     public static class InterestedA extends ConcreteInterested{
 
         @Override
-        public void getNotified(RetryNotification retryNotification) {
+        public void getNotified(AutoretryNotification autoretryNotification) {
             this.called = true;
-            System.out.println(retryNotification);
+            System.out.println(autoretryNotification);
         }
 
     }
@@ -52,14 +52,14 @@ class RetryNotificationTest {
     public static class InterestedB extends ConcreteInterested{
 
         @Override
-        public void getNotified(RetryNotification retryNotification) {
+        public void getNotified(AutoretryNotification autoretryNotification) {
             this.called = true;
-            System.out.println(retryNotification);
+            System.out.println(autoretryNotification);
         }
 
     }
 
-    public static abstract class ConcreteInterested implements RetryObserver {
+    public static abstract class ConcreteInterested implements AutoretryObserver {
         public Boolean called = false;
     }
 
