@@ -1,14 +1,11 @@
 package com.cae.trier;
 
-import com.cae.mapped_exceptions.MappedException;
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
-import com.cae.trier.autoretry.AsyncDelayScheduler;
-import com.cae.trier.autoretry.NoRetriesLeftException;
-import com.cae.trier.autoretry.AutoretryPolicy;
+import com.cae.trier.retry.RetryPolicy;
+import com.cae.trier.retry.NoRetriesLeftException;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletionException;
 
 /**
  * Interface that represents an action which has an input and an output
@@ -21,7 +18,7 @@ public abstract class Action <I, O>{
 
     public O execute(
             I input,
-            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies){
+            Map<Class<? extends Exception>, RetryPolicy> retryPolicies){
         try {
             return this.executeInternalAction(input);
         } catch (NoRetriesLeftException noRetriesLeftException){
@@ -32,7 +29,7 @@ public abstract class Action <I, O>{
                 var delayToWait = retryPolicyByException.get()
                         .getRetryTracker()
                         .trackNewAttemptOn(problem);
-                return this.runRetryOn(input, retryPolicies, delayToWait);
+                return this.runRetryOn(input, retryPolicies, delayToWait, retryPolicyByException.get());
             }
             else
                 throw problem;
@@ -41,28 +38,23 @@ public abstract class Action <I, O>{
 
     private O runRetryOn(
             I input,
-            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies,
-            Integer delayToWait) {
+            Map<Class<? extends Exception>, RetryPolicy> retryPolicies,
+            Long delayToWait,
+            RetryPolicy retryPolicy) {
         try{
-            return AsyncDelayScheduler.SINGLETON.scheduleWithDelay(
-                () -> this.execute(input, retryPolicies),
-                delayToWait
-            )
-            .join();
-        } catch (CompletionException completionException){
-            if (completionException.getCause() instanceof MappedException)
-                throw (MappedException) completionException.getCause();
-            else
-                throw new InternalMappedException(
-                        "Something went unexpectedly wrong while trying to perform retry at the Action level",
-                        "More details: " + completionException.getCause()
-                );
+            retryPolicy.getTimeUnit().sleep(delayToWait);
+            return this.execute(input, retryPolicies);
+        } catch (InterruptedException interruptedException){
+            throw new InternalMappedException(
+                    "Something went unexpectedly wrong while trying to perform retry at the Action level",
+                    "More details: " + interruptedException.getCause()
+            );
         }
     }
 
-    private Optional<AutoretryPolicy> getRetryPolicyBy(
+    private Optional<RetryPolicy> getRetryPolicyBy(
             Exception exception,
-            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies){
+            Map<Class<? extends Exception>, RetryPolicy> retryPolicies){
         return Optional.ofNullable(retryPolicies.get(exception.getClass()));
     }
 

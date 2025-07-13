@@ -1,14 +1,14 @@
-package com.cae.trier.autoretry;
+package com.cae.trier.retry;
 
-public class AutoretryNotification {
+public class RetryNotification {
 
-    public static AutoretryNotification of(
+    public static RetryNotification of(
             Exception cause,
             Integer totalAtThisPoint){
-        return new AutoretryNotification(cause, totalAtThisPoint);
+        return new RetryNotification(cause, totalAtThisPoint);
     }
 
-    protected AutoretryNotification(
+    protected RetryNotification(
             Exception cause,
             Integer totalAtThisPoint) {
         this.cause = cause;

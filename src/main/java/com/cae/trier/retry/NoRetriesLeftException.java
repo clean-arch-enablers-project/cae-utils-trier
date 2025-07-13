@@ -1,4 +1,4 @@
-package com.cae.trier.autoretry;
+package com.cae.trier.retry;
 
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
 

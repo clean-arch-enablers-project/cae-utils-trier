@@ -1,4 +1,4 @@
-package com.cae.trier.autoretry;
+package com.cae.trier.retry;
 
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
 import com.cae.trier.Trier;
@@ -8,9 +8,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @ExtendWith(MockitoExtension.class)
-class AutoretryNotificationTest {
+class RetryNotificationTest {
 
     @Test
     void shouldNotifyAllInterested() {
@@ -19,16 +20,16 @@ class AutoretryNotificationTest {
         var interestedB = new InterestedB();
         var interestedB2 = new InterestedB();
         List.of(interestedA, interestedA2, interestedB, interestedB2).forEach(interested -> Assertions.assertFalse(interested.called));
-        AutoretryNotifier.SINGLETON
+        RetryNotifier.SINGLETON
                 .subscribe(interestedA)
                 .subscribe(interestedA2)
                 .subscribe(interestedB)
                 .subscribe(interestedB2);
         try {
             Trier.of(this::someFailingAction)
-                    .autoretryOn(RuntimeException.class, 5, 1)
+                    .retryOn(RuntimeException.class, 5, 1, TimeUnit.SECONDS)
                     .onExhaustion(failureStatus -> System.out.println("I knew it! " + failureStatus.getException()))
-                    .setUnexpectedExceptionHandler(unexpectedException -> new InternalMappedException("opsie", "indeed"))
+                    .onUnexpectedExceptions(unexpectedException -> new InternalMappedException("opsie", "indeed"))
                     .execute();
         } catch (NoRetriesLeftException noRetriesLeftException){
             List.of(interestedA, interestedA2, interestedB, interestedB2).forEach(interested -> Assertions.assertTrue(interested.called));
@@ -42,9 +43,9 @@ class AutoretryNotificationTest {
     public static class InterestedA extends ConcreteInterested{
 
         @Override
-        public void getNotified(AutoretryNotification autoretryNotification) {
+        public void receiveAutoretryNotification(RetryNotification retryNotification) {
             this.called = true;
-            System.out.println(autoretryNotification);
+            System.out.println(retryNotification);
         }
 
     }
@@ -52,14 +53,14 @@ class AutoretryNotificationTest {
     public static class InterestedB extends ConcreteInterested{
 
         @Override
-        public void getNotified(AutoretryNotification autoretryNotification) {
+        public void receiveAutoretryNotification(RetryNotification retryNotification) {
             this.called = true;
-            System.out.println(autoretryNotification);
+            System.out.println(retryNotification);
         }
 
     }
 
-    public static abstract class ConcreteInterested implements AutoretryObserver {
+    public static abstract class ConcreteInterested implements RetrySubscriber {
         public Boolean called = false;
     }
 
