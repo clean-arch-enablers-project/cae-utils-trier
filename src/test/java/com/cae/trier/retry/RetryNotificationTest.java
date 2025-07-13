@@ -27,7 +27,7 @@ class RetryNotificationTest {
                 .subscribe(interestedB2);
         try {
             Trier.of(this::someFailingAction)
-                    .retryOn(RuntimeException.class, 5, 1, TimeUnit.SECONDS)
+                    .retryOn(RuntimeException.class, 5, 300, TimeUnit.MILLISECONDS)
                     .onExhaustion(failureStatus -> System.out.println("I knew it! " + failureStatus.getException()))
                     .onUnexpectedExceptions(unexpectedException -> new InternalMappedException("opsie", "indeed"))
                     .execute();

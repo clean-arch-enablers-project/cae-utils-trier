@@ -69,7 +69,7 @@ class TrierTest {
     @Test
     void shouldRetryOnRuntimeException(){
         var trier = Trier.of(() -> new Actions().runtimeExceptionThrowingMethod()) //the method is forced to throw RuntimeException
-            .retryOn(RuntimeException.class, 3, 2, TimeUnit.SECONDS)
+            .retryOn(RuntimeException.class, 3, 200, TimeUnit.MILLISECONDS)
             .onExhaustion(this::handleExhaustion)
             .onUnexpectedExceptions(unexpectedException -> new InternalMappedException(
                 "Something went wrong while trying to run the method",
@@ -81,7 +81,7 @@ class TrierTest {
     @Test
     void shouldRetryOnInputMappedException(){
         var trier = Trier.of(() -> new Actions().inputMappedExceptionThrowingMethod()) //the method is forced to throw InputMappedException
-                .retryOn(InputMappedException.class, 3, 2, TimeUnit.SECONDS)
+                .retryOn(InputMappedException.class, 3, 200, TimeUnit.MILLISECONDS)
                 .onExhaustion(this::handleExhaustion)
                 .onUnexpectedExceptions(unexpectedException -> new InternalMappedException(
                         "Something went wrong while trying to run the method",
@@ -94,9 +94,9 @@ class TrierTest {
     void shouldBeAbleToFinishSuccessfullyAfterSecondRetry(){
         var action = new Actions();
         var trier = Trier.of(action::someIntermittentMethod) //the method is forced to throw RuntimeException
-                .retryOn(InternalMappedException.class, 3, 2, TimeUnit.SECONDS)
-                .retryOn(RuntimeException.class, 3, 2, TimeUnit.SECONDS)
-                .retryOn(IOException.class, 5, 1, TimeUnit.SECONDS)
+                .retryOn(InternalMappedException.class, 3, 200, TimeUnit.MILLISECONDS)
+                .retryOn(RuntimeException.class, 3, 200, TimeUnit.MILLISECONDS)
+                .retryOn(IOException.class, 5, 100, TimeUnit.MILLISECONDS)
                 .onExhaustion(this::handleExhaustion)
                 .onUnexpectedExceptions(unexpectedException -> new InternalMappedException(
                         "Something went wrong while trying to run the method",
