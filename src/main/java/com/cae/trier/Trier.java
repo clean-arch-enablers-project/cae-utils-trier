@@ -3,13 +3,14 @@ package com.cae.trier;
 
 import com.cae.mapped_exceptions.MappedException;
 import com.cae.mapped_exceptions.specifics.InternalMappedException;
-import com.cae.trier.autoretry.AutoretryPolicy;
-import com.cae.trier.autoretry.NoRetriesLeftException;
-import com.cae.trier.autoretry.OnExhaustion;
+import com.cae.trier.retry.RetryPolicy;
+import com.cae.trier.retry.NoRetriesLeftException;
+import com.cae.trier.retry.OnExhaustion;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -44,7 +45,7 @@ public class Trier<I, O> {
     /**
      * Map for exceptions that must trigger retry attempts
      */
-    private final Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies;
+    private final Map<Class<? extends Exception>, RetryPolicy> retryPolicies;
     /**
      * Handler for failed executions
      */
@@ -54,7 +55,7 @@ public class Trier<I, O> {
             Action<I, O> action,
             I input,
             UnexpectedExceptionHandler unexpectedExceptionHandler,
-            Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies,
+            Map<Class<? extends Exception>, RetryPolicy> retryPolicies,
             OnExhaustion onExhaustionHandler) {
         this.action = action;
         this.input = input;
@@ -127,8 +128,8 @@ public class Trier<I, O> {
         } catch (NoRetriesLeftException noRetriesLeftException){
             Optional.ofNullable(this.onExhaustionHandler)
                     .orElseThrow(() -> new InternalMappedException(
-                            "Exhausted all retries but no circuit-break setting was provided",
-                            "If you are dealing with retries, make sure you set a circuit-break option by calling the 'onFailure' method while building the Trier object"
+                            "Exhausted all retries and no OnExhaustion handler was provided",
+                            "When configuring your Trier with the autoretry feature, make sure to provide an OnExhaustion handler using the TrierBuilder.onExhaustion(OnExhaustion) API."
                     ))
                     .handle(noRetriesLeftException.getFailureStatus());
             throw noRetriesLeftException;
@@ -149,7 +150,7 @@ public class Trier<I, O> {
 
         private final Action<I, O> action;
         private final I input;
-        private final Map<Class<? extends Exception>, AutoretryPolicy> retryPolicies = new HashMap<>();
+        private final Map<Class<? extends Exception>, RetryPolicy> retryPolicies = new HashMap<>();
         private OnExhaustion onExhaustion;
 
         private TrierBuilder(Action<I, O> action, I input) {
@@ -157,12 +158,13 @@ public class Trier<I, O> {
             this.input = input;
         }
 
-        public <E extends Exception> TrierBuilder<I, O> autoretryOn(
+        public <E extends Exception> TrierBuilder<I, O> retryOn(
                 Class<E> exceptionClass,
-                Integer maxAmountOfRetries,
-                Integer baseTimeInSeconds){
+                Integer maxRetries,
+                long baseTime,
+                TimeUnit timeUnit){
             if (exceptionClass != NoRetriesLeftException.class)
-                this.retryPolicies.put(exceptionClass, AutoretryPolicy.of(maxAmountOfRetries, baseTimeInSeconds));
+                this.retryPolicies.put(exceptionClass, RetryPolicy.of(maxRetries, baseTime, timeUnit));
             return this;
         }
 
@@ -185,7 +187,7 @@ public class Trier<I, O> {
          * as the input to be fed to the action if necessary, and the handler
          * for unexpected exceptions.
          */
-        public Trier<I, O> setUnexpectedExceptionHandler(UnexpectedExceptionHandler handler){
+        public Trier<I, O> onUnexpectedExceptions(UnexpectedExceptionHandler handler){
             return new Trier<>(
                     this.action,
                     this.input,

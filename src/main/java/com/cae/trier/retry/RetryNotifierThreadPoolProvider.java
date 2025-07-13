@@ -1,14 +1,14 @@
-package com.cae.trier.autoretry;
+package com.cae.trier.retry;
 
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AutoretryNotifierThreadPoolProvider {
+public class RetryNotifierThreadPoolProvider {
 
-    public static final AutoretryNotifierThreadPoolProvider SINGLETON = new AutoretryNotifierThreadPoolProvider();
+    public static final RetryNotifierThreadPoolProvider SINGLETON = new RetryNotifierThreadPoolProvider();
 
-    private AutoretryNotifierThreadPoolProvider(){
+    private RetryNotifierThreadPoolProvider(){
         Runtime.getRuntime()
                 .addShutdownHook(new Thread(this::shutdown, "RetryNotifier-ShutdownHook"));
     }
@@ -35,32 +35,32 @@ public class AutoretryNotifierThreadPoolProvider {
     protected String poolName;
 
 
-    public AutoretryNotifierThreadPoolProvider setExecutor(ExecutorService executor){
+    public RetryNotifierThreadPoolProvider setExecutor(ExecutorService executor){
         this.executor = executor;
         return this;
     }
 
-    public AutoretryNotifierThreadPoolProvider setMinSize(Integer minSize){
+    public RetryNotifierThreadPoolProvider setMinSize(Integer minSize){
         this.minSize = minSize;
         return this;
     }
 
-    public AutoretryNotifierThreadPoolProvider setMaxSize(Integer maxSize){
+    public RetryNotifierThreadPoolProvider setMaxSize(Integer maxSize){
         this.maxSize = maxSize;
         return this;
     }
 
-    public AutoretryNotifierThreadPoolProvider setKeepAliveTimeForIdleThreadsInSeconds(Long keepAliveTimeForIdleThreadsInSeconds){
+    public RetryNotifierThreadPoolProvider setKeepAliveTimeForIdleThreadsInSeconds(Long keepAliveTimeForIdleThreadsInSeconds){
         this.keepAliveTimeForIdleThreadsInSeconds = keepAliveTimeForIdleThreadsInSeconds;
         return this;
     }
 
-    public AutoretryNotifierThreadPoolProvider setQueueCapacity(Integer queueCapacity){
+    public RetryNotifierThreadPoolProvider setQueueCapacity(Integer queueCapacity){
         this.queueCapacity = queueCapacity;
         return this;
     }
 
-    public AutoretryNotifierThreadPoolProvider setPoolName(String poolName){
+    public RetryNotifierThreadPoolProvider setPoolName(String poolName){
         this.poolName = poolName;
         return this;
     }
@@ -74,8 +74,8 @@ public class AutoretryNotifierThreadPoolProvider {
 
     private ExecutorService autoProvideExecutor() {
         return new ThreadPoolExecutor(
-                Optional.ofNullable(this.minSize).orElse(10),
-                Optional.ofNullable(this.maxSize).orElse(20),
+                Optional.ofNullable(this.minSize).orElse(5),
+                Optional.ofNullable(this.maxSize).orElse(30),
                 Optional.ofNullable(this.keepAliveTimeForIdleThreadsInSeconds).orElse(60L),
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(Optional.ofNullable(this.queueCapacity).orElse(100)),
