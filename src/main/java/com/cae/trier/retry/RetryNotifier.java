@@ -17,7 +17,7 @@ public class RetryNotifier {
 
     public void emitNewNotification(RetryNotification notification){
         var executor = RetryNotifierThreadPoolProvider.SINGLETON.getExecutor();
-        this.interested.forEach(subscriber -> executor.submit(() -> subscriber.receiveAutoretryNotification(notification)));
+        this.interested.forEach(subscriber -> executor.submit(() -> subscriber.receiveRetryNotification(notification)));
     }
 
 }

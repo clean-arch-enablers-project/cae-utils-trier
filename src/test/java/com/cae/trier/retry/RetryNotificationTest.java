@@ -43,7 +43,7 @@ class RetryNotificationTest {
     public static class InterestedA extends ConcreteInterested{
 
         @Override
-        public void receiveAutoretryNotification(RetryNotification retryNotification) {
+        public void receiveRetryNotification(RetryNotification retryNotification) {
             this.called = true;
             System.out.println(retryNotification);
         }
@@ -53,7 +53,7 @@ class RetryNotificationTest {
     public static class InterestedB extends ConcreteInterested{
 
         @Override
-        public void receiveAutoretryNotification(RetryNotification retryNotification) {
+        public void receiveRetryNotification(RetryNotification retryNotification) {
             this.called = true;
             System.out.println(retryNotification);
         }
