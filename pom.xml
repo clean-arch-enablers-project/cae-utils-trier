@@ -8,12 +8,12 @@
     <url>https://github.com/clean-arch-enablers-project/cae-utils-trier/blob/main/README.md</url>
     <groupId>com.clean-arch-enablers</groupId>
     <artifactId>cae-trier</artifactId>
-    <version>5.0.0</version>
+    <version>6.0.0-RC1</version>
     <packaging>jar</packaging>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
     <scm>
@@ -37,13 +37,13 @@
         <dependency>
             <groupId>com.clean-arch-enablers</groupId>
             <artifactId>cae-mapped-exceptions</artifactId>
-            <version>1.0.0</version>
+            <version>6.0.0-RC1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.16</version>
+            <version>1.5.32</version>
             <scope>test</scope>
         </dependency>
         <dependency>
