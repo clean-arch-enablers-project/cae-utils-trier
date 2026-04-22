@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cae-utils-trier"
+version = "1.0.0rc1"
+description = "Retry utility inspired by CAE Trier"
+readme = "README.md"
+requires-python = ">=3.14.4"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "José Júnior" }
+]
+dependencies = []
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
