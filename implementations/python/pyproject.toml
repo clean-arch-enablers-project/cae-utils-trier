@@ -1,21 +1,36 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cae-utils-trier"
 version = "1.0.0rc1"
-description = "Retry utility inspired by CAE Trier"
-readme = "README.md"
-requires-python = ">=3.14.4"
-license = { text = "Apache-2.0" }
-authors = [
-  { name = "José Júnior" }
+dependencies = [
+    "cae-utils-mapped-exceptions==1.0.0rc4"
 ]
-dependencies = []
+description = "Trier utility library for Python"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [
+  { name = "Ze Lucio Jr" }
+]
+keywords = ["retries", "exception-handling", "mapped-exceptions", "trier", "cae", "utils"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent"
+]
 
-[tool.setuptools.package-dir]
-"" = "src"
+[project.urls]
+Homepage = "https://github.com/clean-arch-enablers-project/cae-utils-trier"
+Repository = "https://github.com/clean-arch-enablers-project/cae-utils-trier"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"cae_mapped_exceptions" = ["py.typed"]
