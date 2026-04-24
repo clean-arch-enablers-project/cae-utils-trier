@@ -150,12 +150,17 @@ class Action(Generic[INPUT, OUTPUT]):
 
 class Builder(Generic[INPUT, OUTPUT]):
 
-    __retry_policies: dict[type[Exception], RetryPolicy] = {}
-    __exha_handler: Callable[[ExhaustionReason], MappedException] | None = None
-    __unexp_excep_handler: Callable[[Exception], MappedException] | None = None
-
     def __init__(self, action: Callable[INPUT, OUTPUT]):
         self.__action = action
+        self.__retry_policies: dict[type[Exception], RetryPolicy] = {}
+        self.__exha_handler: Callable[
+            [ExhaustionReason],
+            MappedException
+        ] | None = None
+        self.__unexp_excep_handler: Callable[
+            [Exception],
+            MappedException
+        ] | None = None
 
     def retry_on(
             self,

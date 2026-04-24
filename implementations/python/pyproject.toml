@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cae-utils-trier"
-version = "1.0.0rc1"
+version = "1.0.0rc3"
 dependencies = [
     "cae-utils-mapped-exceptions==1.0.0rc4"
 ]
@@ -33,4 +33,4 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"cae_mapped_exceptions" = ["py.typed"]
+"cae_trier" = ["py.typed"]

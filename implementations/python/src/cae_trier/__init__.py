@@ -17,4 +17,4 @@ __all__ = [
     "FallbackFailureMappedException"
 ]
 
-__version__ = "1.0.0rc1"
+__version__ = "1.0.0rc3"
